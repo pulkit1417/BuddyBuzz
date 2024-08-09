@@ -2,7 +2,7 @@
 
 This is a simple real-time chat application built using Node.js, Express, and Socket.io. The app allows multiple clients to connect and chat with each other in real-time.
 
-![Chat Application](![image](https://github.com/user-attachments/assets/0bef56fc-2ed9-4f5e-ae13-97b3fc055585)
+![Chat Application]([image](https://github.com/user-attachments/assets/0bef56fc-2ed9-4f5e-ae13-97b3fc055585)
 )  <!-- You can include a screenshot of your app here -->
 
 ## 🚀 Features
