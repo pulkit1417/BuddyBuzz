@@ -1,27 +1,38 @@
-import express from "express";
-import { createServer } from "node:http";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
-import { Server } from "socket.io";
+const express = require('express')
+const path = require('path')
+const app = express()
+const PORT =8000
+const server = app.listen(PORT, () => console.log(`💬 server on port ${PORT}`))
 
-const app = express();
-const server = createServer(app);
-const io = new Server(server, {
-    connectionStateRecovery: {}
-  });
+const io = require('socket.io')(server)
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, 'public')))
 
-app.get("/", (req, res) => {
-    res.sendFile(join(__dirname, "index.html"));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-io.on('connection', (socket) => { 
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', msg);
-    })
-});
+let socketsConected = new Set()
 
-server.listen(8000, () => {
-    console.log('Server is running on port 8000');
-});
+io.on('connection', onConnected)
+
+function onConnected(socket) {
+  console.log('Socket connected', socket.id)
+  socketsConected.add(socket.id)
+  io.emit('clients-total', socketsConected.size)
+
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected', socket.id)
+    socketsConected.delete(socket.id)
+    io.emit('clients-total', socketsConected.size)
+  })
+
+  socket.on('message', (data) => {
+    // console.log(data)
+    socket.broadcast.emit('chat-message', data)
+  })
+
+  socket.on('feedback', (data) => {
+    socket.broadcast.emit('feedback', data)
+  })
+}
